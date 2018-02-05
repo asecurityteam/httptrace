@@ -40,6 +40,7 @@ func TestMiddlewareGeneratesNewSpans(t *testing.T) {
 	var handler = NewMiddleware(
 		MiddlewareOptionLogFetcher(fromContext),
 		MiddlewareOptionServiceName("testservice"),
+		MiddlewareOptionHostPort("localhost:8080"),
 	)(&wrapped)
 	handler.ServeHTTP(w, r)
 
@@ -73,6 +74,7 @@ func TestMiddlewareGeneratesAdoptsHeaders(t *testing.T) {
 	var handler = NewMiddleware(
 		MiddlewareOptionLogFetcher(fromContext),
 		MiddlewareOptionServiceName("testservice"),
+		MiddlewareOptionHostPort("localhost:8080"),
 	)(&wrapped)
 	r.Header.Set("X-B3-TraceId", "0000000000000001")
 	r.Header.Set("X-B3-SpanId", "0000000000000002")
