@@ -8,9 +8,10 @@ import:
   vcs: git
   version: ^v1.0.2
 - package: bitbucket.org/atlassian/logevent
-  repo: git@bitbucket.org:atlassian/logevent
   vcs: git
-  version: ^1.0.0
+  # version: origin/master
+  version: origin/support-nested-structs
+  repo: git@bitbucket.org:atlassian/logevent
 - package: github.com/fatih/structs
   vcs: git
   version: ^1.0.0
