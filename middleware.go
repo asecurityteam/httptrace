@@ -21,12 +21,13 @@ var (
 type Middleware struct {
 	wrapped     http.Handler
 	serviceName string
+	hostPort    string
 	fromContext func(context.Context) logevent.Logger
 }
 
 func (h *Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var collector = &collector{h.fromContext(r.Context())}
-	var recorder = zipkin.NewRecorder(collector, false, "80", h.serviceName)
+	var recorder = zipkin.NewRecorder(collector, false, h.hostPort, h.serviceName)
 	var tracer, err = zipkin.NewTracer(recorder)
 	if err != nil {
 		h.wrapped.ServeHTTP(w, r)
@@ -60,6 +61,16 @@ type MiddlewareOption func(*Middleware) *Middleware
 func MiddlewareOptionServiceName(name string) MiddlewareOption {
 	return func(m *Middleware) *Middleware {
 		m.serviceName = name
+		return m
+	}
+}
+
+// MiddlewareOptionHostPort sets host:port annotation used to represent the
+// service in spans associated with the incoming request. The default value of
+// this option is 0.0.0.0:80.
+func MiddlewareOptionHostPort(hostPort string) MiddlewareOption {
+	return func(m *Middleware) *Middleware {
+		m.hostPort = hostPort
 		return m
 	}
 }
