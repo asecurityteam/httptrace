@@ -112,21 +112,21 @@ func SpanIDFromContext(ctx context.Context) string {
 	return fmt.Sprintf("%016x", ctx.Value(spanCtxKey))
 }
 
-// OutOfBand returns a Tracer with all of the configuration provided to the
+// OutOfBand returns a context with all of the configuration provided to the
 // middleware. This is provided with the primary intent of allowing for trace
 // emissions during runtime setup (such as main.go) and background routines that
 // are not attached to a request or request context.
-func OutOfBand(ctx context.Context, middleware func(http.Handler) http.Handler) opentracing.Tracer {
+func OutOfBand(ctx context.Context, middleware func(http.Handler) http.Handler) context.Context {
 	var m *Middleware
 	var ok bool
 	if m, ok = middleware(nil).(*Middleware); !ok {
-		return &opentracing.NoopTracer{}
+		return opentracing.ContextWithSpan(ctx, opentracing.GlobalTracer().StartSpan("background"))
 	}
 	var collector = &collector{m.fromContext(ctx)}
 	var recorder = zipkin.NewRecorder(collector, false, "80", m.serviceName)
 	var tracer, err = zipkin.NewTracer(recorder)
 	if err != nil {
-		return &opentracing.NoopTracer{}
+		return opentracing.ContextWithSpan(ctx, opentracing.GlobalTracer().StartSpan("background"))
 	}
-	return tracer
+	return opentracing.ContextWithSpan(ctx, tracer.StartSpan("background"))
 }
