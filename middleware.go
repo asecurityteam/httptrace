@@ -22,13 +22,10 @@ type Middleware struct {
 	wrapped     http.Handler
 	serviceName string
 	hostPort    string
-	fromContext func(context.Context) logevent.Logger
 }
 
 func (h *Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var collector = &collector{h.fromContext(r.Context())}
-	var recorder = zipkin.NewRecorder(collector, false, h.hostPort, h.serviceName)
-	var tracer, err = zipkin.NewTracer(recorder)
+	var tracer, err = NewTracer(logevent.FromContext(r.Context()), h.serviceName, h.hostPort)
 	if err != nil {
 		h.wrapped.ServeHTTP(w, r)
 		return
@@ -75,24 +72,12 @@ func MiddlewareOptionHostPort(hostPort string) MiddlewareOption {
 	}
 }
 
-// MiddlewareOptionLogFetcher installs a custom function that will be used to
-// extract the logevent.Logger from the context. The default value of this
-// option is the logevent.FromContext method which leverages the default
-// logging implementation. This setting must given if using a custom logging
-// implementation with logevent.
-func MiddlewareOptionLogFetcher(f func(context.Context) logevent.Logger) MiddlewareOption {
-	return func(m *Middleware) *Middleware {
-		m.fromContext = f
-		return m
-	}
-}
-
 // NewMiddleware creates a middleware.
 func NewMiddleware(options ...MiddlewareOption) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		var middleware = &Middleware{
 			serviceName: "HTTPService",
-			fromContext: logevent.FromContext,
+			hostPort:    "0.0.0.0:80",
 			wrapped:     next,
 		}
 		for _, option := range options {
@@ -110,23 +95,4 @@ func TraceIDFromContext(ctx context.Context) string {
 // SpanIDFromContext returns the active TraceID value as a string.
 func SpanIDFromContext(ctx context.Context) string {
 	return fmt.Sprintf("%016x", ctx.Value(spanCtxKey))
-}
-
-// OutOfBand returns a context with all of the configuration provided to the
-// middleware. This is provided with the primary intent of allowing for trace
-// emissions during runtime setup (such as main.go) and background routines that
-// are not attached to a request or request context.
-func OutOfBand(ctx context.Context, middleware func(http.Handler) http.Handler) context.Context {
-	var m *Middleware
-	var ok bool
-	if m, ok = middleware(nil).(*Middleware); !ok {
-		return opentracing.ContextWithSpan(ctx, opentracing.GlobalTracer().StartSpan("background"))
-	}
-	var collector = &collector{m.fromContext(ctx)}
-	var recorder = zipkin.NewRecorder(collector, false, "80", m.serviceName)
-	var tracer, err = zipkin.NewTracer(recorder)
-	if err != nil {
-		return opentracing.ContextWithSpan(ctx, opentracing.GlobalTracer().StartSpan("background"))
-	}
-	return opentracing.ContextWithSpan(ctx, tracer.StartSpan("background"))
 }

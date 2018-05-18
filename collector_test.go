@@ -1,49 +1,50 @@
 package stridetrace
 
 import (
-	"context"
 	"testing"
 
-	"bitbucket.org/atlassian/logevent"
+	"github.com/golang/mock/gomock"
 	"github.com/openzipkin/zipkin-go-opentracing/thrift/gen-go/zipkincore"
 )
 
 func TestCollectorNoParent(t *testing.T) {
-	var emitted bool
-	var logFunc = func(ctx context.Context, level logevent.LogLevel, message string, annotations map[string]interface{}) {
-		emitted = true
-		var traceData, ok = annotations["zipkin"].(jsonSpan)
-		if !ok {
-			t.Fatal("could not fetch the zipkin trace object", annotations)
+	var ctrl = gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var logger = NewMockLogger(ctrl)
+	logger.EXPECT().Info(gomock.Any()).Do(func(event interface{}) {
+		var evt frame
+		var ok bool
+		if evt, ok = event.(frame); !ok {
+			t.Error("did not log a zipkin frame")
 		}
-		if traceData.Name != "TEST" {
-			t.Errorf("expected the name TEST but found %s", traceData.Name)
+		if evt.Zipkin.ParentID != "" {
+			t.Errorf("expected no parent but found %s", evt.Zipkin.ParentID)
 		}
-		if traceData.ParentID != "" {
-			t.Errorf("expected no ParentID but found %s", traceData.ParentID)
+		if evt.Zipkin.TraceID != "0000000000000001" {
+			t.Errorf("expected trace 0000000000000001 but found %s", evt.Zipkin.TraceID)
 		}
-		if traceData.TraceID != "0000000000000001" {
-			t.Errorf("expected the TraceID 0000000000000001 but found %s", traceData.TraceID)
+		if evt.Zipkin.SpanID != "0000000000000002" {
+			t.Errorf("expected span 0000000000000002 but found %s", evt.Zipkin.SpanID)
 		}
-		if traceData.SpanID != "0000000000000002" {
-			t.Errorf("expected the SpanID 0000000000000002 but found %s", traceData.SpanID)
+		if evt.Zipkin.Name != "TEST" {
+			t.Errorf("expected name TEST but found %s", evt.Zipkin.Name)
 		}
-		if len(traceData.BinaryAnnotations) != 1 {
-			t.Errorf("expected 1 binary annotation, got %d", len(traceData.BinaryAnnotations))
+		if len(evt.Zipkin.BinaryAnnotations) != 1 {
+			t.Errorf("expected 1 binary annotation but got %d", len(evt.Zipkin.BinaryAnnotations))
 		} else {
-			if traceData.BinaryAnnotations[0].Key != "TESTTAG" || traceData.BinaryAnnotations[0].Value != "TESTVALUE" {
-				t.Errorf("expected binary annotation of TESTTAG=TESTVALUE, got %s=%s", traceData.BinaryAnnotations[0].Key, traceData.BinaryAnnotations[0].Value)
+			if evt.Zipkin.BinaryAnnotations[0].Key != "TESTTAG" || evt.Zipkin.BinaryAnnotations[0].Value != "TESTVALUE" {
+				t.Errorf("expected binary annotation of TESTTAG=TESTVALUE but got %s=%s", evt.Zipkin.BinaryAnnotations[0].Key, evt.Zipkin.BinaryAnnotations[0].Value)
 			}
 		}
-		for _, a := range traceData.Annotations {
-			switch a.Value {
-			case "TESTANNOTATION":
-			default:
-				t.Errorf("expected annotation ss or sr, got %s", a.Value)
+		if len(evt.Zipkin.Annotations) != 1 {
+			t.Errorf("expected 1 annotation but got %d", len(evt.Zipkin.Annotations))
+		} else {
+			if evt.Zipkin.Annotations[0].Value != "TESTANNOTATION" || evt.Zipkin.Annotations[0].Endpoint.ServiceName != "TESTSERVICE" {
+				t.Errorf("expected annotation TESTANNOTATION with endpoint TESTSERVICE but got %s:%s", evt.Zipkin.Annotations[0].Value, evt.Zipkin.Annotations[0].Endpoint.ServiceName)
 			}
 		}
-	}
-	var logger = logevent.New(context.Background(), logFunc)
+	})
 	var collector = collector{logger}
 	var span = &zipkincore.Span{
 		ParentID: nil,
@@ -67,49 +68,48 @@ func TestCollectorNoParent(t *testing.T) {
 		},
 	}
 	collector.Collect(span)
-	if !emitted {
-		t.Fatal("did not log")
-	}
 }
 
 func TestCollectorWithParent(t *testing.T) {
-	var emitted bool
-	var logFunc = func(ctx context.Context, level logevent.LogLevel, message string, annotations map[string]interface{}) {
-		emitted = true
-		var traceData, ok = annotations["zipkin"].(jsonSpan)
-		if !ok {
-			t.Fatal("could not fetch the zipkin trace object")
+	var ctrl = gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var logger = NewMockLogger(ctrl)
+	logger.EXPECT().Info(gomock.Any()).Do(func(event interface{}) {
+		var evt frame
+		var ok bool
+		if evt, ok = event.(frame); !ok {
+			t.Error("did not log a zipkin frame")
 		}
-		if traceData.Name != "TEST" {
-			t.Errorf("expected the name TEST but found %s", traceData.Name)
+		if evt.Zipkin.ParentID != "0000000000000003" {
+			t.Errorf("expected parent 0000000000000003 but found %s", evt.Zipkin.ParentID)
 		}
-		if traceData.ParentID != "0000000000000000" {
-			t.Errorf("expected the ParentID 0000000000000001 but found %s", traceData.ParentID)
+		if evt.Zipkin.TraceID != "0000000000000001" {
+			t.Errorf("expected trace 0000000000000001 but found %s", evt.Zipkin.TraceID)
 		}
-		if traceData.TraceID != "0000000000000001" {
-			t.Errorf("expected the TraceID 0000000000000001 but found %s", traceData.TraceID)
+		if evt.Zipkin.SpanID != "0000000000000002" {
+			t.Errorf("expected span 0000000000000002 but found %s", evt.Zipkin.SpanID)
 		}
-		if traceData.SpanID != "0000000000000002" {
-			t.Errorf("expected the SpanID 0000000000000002 but found %s", traceData.SpanID)
+		if evt.Zipkin.Name != "TEST" {
+			t.Errorf("expected name TEST but found %s", evt.Zipkin.Name)
 		}
-		if len(traceData.BinaryAnnotations) != 1 {
-			t.Errorf("expected 1 binary annotation, got %d", len(traceData.BinaryAnnotations))
+		if len(evt.Zipkin.BinaryAnnotations) != 1 {
+			t.Errorf("expected 1 binary annotation but got %d", len(evt.Zipkin.BinaryAnnotations))
 		} else {
-			if traceData.BinaryAnnotations[0].Key != "TESTTAG" || traceData.BinaryAnnotations[0].Value != "TESTVALUE" {
-				t.Errorf("expected binary annotation of TESTTAG=TESTVALUE, got %s=%s", traceData.BinaryAnnotations[0].Key, traceData.BinaryAnnotations[0].Value)
+			if evt.Zipkin.BinaryAnnotations[0].Key != "TESTTAG" || evt.Zipkin.BinaryAnnotations[0].Value != "TESTVALUE" {
+				t.Errorf("expected binary annotation of TESTTAG=TESTVALUE but got %s=%s", evt.Zipkin.BinaryAnnotations[0].Key, evt.Zipkin.BinaryAnnotations[0].Value)
 			}
 		}
-		for _, a := range traceData.Annotations {
-			switch a.Value {
-			case "TESTANNOTATION":
-			default:
-				t.Errorf("expected annotation ss or sr, got %s", a.Value)
+		if len(evt.Zipkin.Annotations) != 1 {
+			t.Errorf("expected 1 annotation but got %d", len(evt.Zipkin.Annotations))
+		} else {
+			if evt.Zipkin.Annotations[0].Value != "TESTANNOTATION" || evt.Zipkin.Annotations[0].Endpoint.ServiceName != "TESTSERVICE" {
+				t.Errorf("expected annotation TESTANNOTATION with endpoint TESTSERVICE but got %s:%s", evt.Zipkin.Annotations[0].Value, evt.Zipkin.Annotations[0].Endpoint.ServiceName)
 			}
 		}
-	}
-	var logger = logevent.New(context.Background(), logFunc)
+	})
 	var collector = collector{logger}
-	var parentID = int64(0)
+	var parentID = int64(3)
 	var span = &zipkincore.Span{
 		ParentID: &parentID,
 		TraceID:  1,
@@ -132,7 +132,4 @@ func TestCollectorWithParent(t *testing.T) {
 		},
 	}
 	collector.Collect(span)
-	if !emitted {
-		t.Fatal("did not log")
-	}
 }
