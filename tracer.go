@@ -1,4 +1,4 @@
-package stridetrace
+package httptrace
 
 import (
 	"bitbucket.org/atlassian/logevent"

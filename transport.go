@@ -1,4 +1,4 @@
-package stridetrace
+package httptrace
 
 import (
 	"net/http"

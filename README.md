@@ -1,6 +1,6 @@
-# stridetrace #
+# httptrace #
 
-**Zipkin tracing integration for Stride HTTP services.**
+**Zipkin tracing integration for HTTP services.**
 
 This project contains middleware for HTTP services and clients that uses
 [openzipkin-go](https://github.com/openzipkin/zipkin-go-opentracing) and
@@ -15,8 +15,8 @@ The middleware exported is a `func(http.Handler) http.Handler` and should
 work with virtually any router/mux implementation that supports middleware.
 
 ```go
-var middleware = stridetrace.NewMiddleware(
-  stridetrace.MiddlewareOptionServiceName("my-service"),
+var middleware = httptrace.NewMiddleware(
+  httptrace.MiddlewareOptionServiceName("my-service"),
 )
 ```
 
@@ -41,9 +41,9 @@ included that will properly manage spans for outgoing HTTP requests. To apply:
 
 ```golang
 var client = &http.Client{
-  Transport: stridetrace.NewTransport(
-    stridetrace.TransportOptionSpanName("outgoing_http_request"),
-    stridetrace.TransportOptionPeerName("remote-service-name"),
+  Transport: httptrace.NewTransport(
+    httptrace.TransportOptionSpanName("outgoing_http_request"),
+    httptrace.TransportOptionPeerName("remote-service-name"),
   )(http.DefaultTransport),
 }
 ```
