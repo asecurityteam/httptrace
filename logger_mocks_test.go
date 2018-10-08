@@ -2,7 +2,7 @@
 // Source: bitbucket.org/atlassian/logevent (interfaces: Logger)
 
 // nolint
-package stridetrace
+package httptrace
 
 import (
 	logevent "bitbucket.org/atlassian/logevent"

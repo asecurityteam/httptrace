@@ -1,4 +1,4 @@
-package stridetrace
+package httptrace
 
 import (
 	"context"
@@ -13,8 +13,8 @@ import (
 type key string
 
 var (
-	traceCtxKey = key("stridetrace-trace")
-	spanCtxKey  = key("stridetrace-span")
+	traceCtxKey = key("httptrace-trace")
+	spanCtxKey  = key("httptrace-span")
 )
 
 // Middleware adds zipkin style request tracing.
