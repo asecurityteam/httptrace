@@ -1,7 +1,7 @@
 package httptrace
 
 import (
-	"bitbucket.org/atlassian/logevent"
+	"github.com/asecurityteam/logevent"
 	opentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 )

@@ -1,14 +1,30 @@
-# httptrace #
+<a id="markdown-httptrace--zipkin-tracing-integration-for-http-services" name="httptrace--zipkin-tracing-integration-for-http-services"></a>
+# httptrace -Zipkin tracing integration for HTTP services. #
 
-**Zipkin tracing integration for HTTP services.**
+*Status: Production*
+
+<!-- TOC -->
+
+- [httptrace -Zipkin tracing integration for HTTP services.](#httptrace--zipkin-tracing-integration-for-http-services)
+    - [Usage](#usage)
+        - [HTTP Service](#http-service)
+        - [HTTP Client](#http-client)
+    - [Span Logs](#span-logs)
+    - [Contributing](#contributing)
+        - [License](#license)
+        - [Contributing Agreement](#contributing-agreement)
+
+<!-- /TOC -->
 
 This project contains middleware for HTTP services and clients that uses
 [openzipkin-go](https://github.com/openzipkin/zipkin-go-opentracing) and
-[logevent](https://bitbucket.org/atlassian/logevent) to both propagate traces
+[logevent](https://github.com/asecurityteam/logevent) to both propagate traces
 between HTTP services and emit traces to the service logs.
 
+<a id="markdown-usage" name="usage"></a>
 ## Usage ##
 
+<a id="markdown-http-service" name="http-service"></a>
 ### HTTP Service ###
 
 The middleware exported is a `func(http.Handler) http.Handler` and should
@@ -34,6 +50,7 @@ you can use the `TraceIDFromContext` or `SpanIDFromContext` helpers which will
 return the ID in a hex encoded string which is what typically ships over via
 headers to other services.
 
+<a id="markdown-http-client" name="http-client"></a>
 ### HTTP Client ###
 
 In addition to an HTTP middleware, there is also an `http.RoundTripper` wrapper
@@ -48,6 +65,7 @@ var client = &http.Client{
 }
 ```
 
+<a id="markdown-span-logs" name="span-logs"></a>
 ## Span Logs ##
 
 As each span is marked as complete the middlewares will use the
@@ -57,12 +75,15 @@ As each span is marked as complete the middlewares will use the
 {"message": "span-complete", "zipkin": {"traceId": "", "id": "", "parentId": "", "name": "", "timestamp": "", "duration": "", "annotations": [{"timestamp": "", "value": ""}], "binaryAnnotations": [{"key": "", "value": ""}]}}
 ```
 
+<a id="markdown-contributing" name="contributing"></a>
 ## Contributing ##
 
+<a id="markdown-license" name="license"></a>
 ### License ###
 
 This project is licensed under Apache 2.0. See LICENSE.txt for details.
 
+<a id="markdown-contributing-agreement" name="contributing-agreement"></a>
 ### Contributing Agreement ###
 
 Atlassian requires signing a contributor's agreement before we can accept a

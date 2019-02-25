@@ -1,4 +1,4 @@
-package: bitbucket.org/atlassian/httptrace
+package: github.com/asecurityteam/httptrace
 import:
 - package: github.com/rs/xlog
 - package: github.com/openzipkin/zipkin-go-opentracing
@@ -7,9 +7,8 @@ import:
 - package: github.com/opentracing/opentracing-go
   vcs: git
   version: ^v1.0.2
-- package: bitbucket.org/atlassian/logevent
+- package: github.com/asecurityteam/logevent
   vcs: git
-  repo: git@bitbucket.org:atlassian/logevent
   version: ^1.0.0
 - package: github.com/fatih/structs
   vcs: git
