@@ -1,0 +1,26 @@
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# for detailed Gopkg.toml documentation.
+
+[[constraint]]
+  name = "github.com/asecurityteam/logevent"
+  version = "1.0.4"
+
+[[constraint]]
+  name = "github.com/golang/mock"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/openzipkin/zipkin-go-opentracing"
+  version = "=v0.3.2"
+
+[[constraint]]
+  name = "github.com/opentracing/opentracing-go"
+  version = "^v1.0.2"
+
+[[override]]
+  name = "github.com/apache/thrift"
+  version = "0.11.0"
+
+[prune]
+  go-tests = true
+  unused-packages = true

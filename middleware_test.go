@@ -8,13 +8,11 @@ import (
 
 	"github.com/asecurityteam/logevent"
 	"github.com/golang/mock/gomock"
-	opentracing "github.com/opentracing/opentracing-go"
 )
 
 type fixtureHandler struct {
 	called bool
 	ctx    context.Context
-	span   opentracing.Span
 }
 
 func (h *fixtureHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

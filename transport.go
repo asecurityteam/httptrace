@@ -58,7 +58,7 @@ func (c *Transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	ext.HTTPMethod.Set(span, r.Method)
 	ext.HTTPUrl.Set(span, r.URL.Path)
 	ext.PeerService.Set(span, c.peerNamer(r))
-	span.Tracer().Inject(span.Context(), opentracing.TextMap, httpHeaderTextMapCarrier(r.Header))
+	_ = span.Tracer().Inject(span.Context(), opentracing.TextMap, httpHeaderTextMapCarrier(r.Header))
 	var resp, er = c.wrapped.RoundTrip(r)
 	if resp != nil {
 		ext.HTTPStatusCode.Set(span, uint16(resp.StatusCode))

@@ -46,7 +46,7 @@ func TestTraceNoopIfNoParent(t *testing.T) {
 		TransportOptionSpanName("TESTSPAN"),
 	)(&fixtureTransport{Response: &resp, Err: nil})
 	var req, _ = http.NewRequest(http.MethodGet, "/", nil)
-	wrapped.RoundTrip(req)
+	_, _ = wrapped.RoundTrip(req)
 }
 
 func TestTraceNoopIfNoParentFailure(t *testing.T) {
@@ -72,7 +72,7 @@ func TestTraceNoopIfNoParentFailure(t *testing.T) {
 	)(&fixtureTransport{Response: &resp, Err: fmt.Errorf("TESTERROR")})
 	var req, _ = http.NewRequest(http.MethodGet, "/", nil)
 
-	wrapped.RoundTrip(req)
+	_, _ = wrapped.RoundTrip(req)
 }
 
 func TestTraceAdoptsSpanIfExists(t *testing.T) {
@@ -115,7 +115,7 @@ func TestTraceAdoptsSpanIfExists(t *testing.T) {
 	tracer.EXPECT().Inject(childSpanContext, opentracing.TextMap, gomock.Any())
 	childSpan.EXPECT().SetTag(string(ext.HTTPStatusCode), uint16(http.StatusOK))
 	childSpan.EXPECT().Finish()
-	wrapped.RoundTrip(req.WithContext(ctx))
+	_, _ = wrapped.RoundTrip(req.WithContext(ctx))
 }
 
 func TestTraceAdoptsSpanIfExistsFailure(t *testing.T) {
@@ -150,7 +150,7 @@ func TestTraceAdoptsSpanIfExistsFailure(t *testing.T) {
 	tracer.EXPECT().Inject(childSpanContext, opentracing.TextMap, gomock.Any())
 	childSpan.EXPECT().SetTag(string(ext.Error), true)
 	childSpan.EXPECT().Finish()
-	wrapped.RoundTrip(req.WithContext(ctx))
+	_, _ = wrapped.RoundTrip(req.WithContext(ctx))
 }
 
 func TestHeaderCarrierInject(t *testing.T) {
@@ -167,7 +167,7 @@ func TestHeaderCarrierForEachSuccess(t *testing.T) {
 	var headers = http.Header{}
 	headers.Add("TEST", "VALUE")
 	var carrier = httpHeaderTextMapCarrier(headers)
-	carrier.ForeachKey(func(k string, v string) error {
+	_ = carrier.ForeachKey(func(k string, v string) error {
 		if strings.ToUpper(k) != "TEST" || strings.ToUpper(v) != "VALUE" {
 			t.Fatalf("invalid foreach values %s:%s", k, v)
 		}
@@ -179,7 +179,7 @@ func TestHeaderCarrierInvalidEncoding(t *testing.T) {
 	var headers = http.Header{}
 	headers.Add("TEST", "%ZZ")
 	var carrier = httpHeaderTextMapCarrier(headers)
-	carrier.ForeachKey(func(k string, v string) error {
+	_ = carrier.ForeachKey(func(k string, v string) error {
 		t.Fatalf("invalid foreach values %s:%s", k, v)
 		return nil
 	})
