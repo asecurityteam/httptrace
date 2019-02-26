@@ -23,3 +23,4 @@ cover.out
 vendor/
 glide.lock
 .vscode
+Gopkg.lock

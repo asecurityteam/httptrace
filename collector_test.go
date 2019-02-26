@@ -7,6 +7,13 @@ import (
 	"github.com/openzipkin/zipkin-go-opentracing/thrift/gen-go/zipkincore"
 )
 
+const (
+	id1  = "0000000000000001"
+	id2  = "0000000000000002"
+	id3  = "0000000000000003"
+	name = "TEST"
+)
+
 func TestCollectorNoParent(t *testing.T) {
 	var ctrl = gomock.NewController(t)
 	defer ctrl.Finish()
@@ -21,13 +28,13 @@ func TestCollectorNoParent(t *testing.T) {
 		if evt.Zipkin.ParentID != "" {
 			t.Errorf("expected no parent but found %s", evt.Zipkin.ParentID)
 		}
-		if evt.Zipkin.TraceID != "0000000000000001" {
+		if evt.Zipkin.TraceID != id1 {
 			t.Errorf("expected trace 0000000000000001 but found %s", evt.Zipkin.TraceID)
 		}
-		if evt.Zipkin.SpanID != "0000000000000002" {
+		if evt.Zipkin.SpanID != id2 {
 			t.Errorf("expected span 0000000000000002 but found %s", evt.Zipkin.SpanID)
 		}
-		if evt.Zipkin.Name != "TEST" {
+		if evt.Zipkin.Name != name {
 			t.Errorf("expected name TEST but found %s", evt.Zipkin.Name)
 		}
 		if len(evt.Zipkin.BinaryAnnotations) != 1 {
@@ -50,7 +57,7 @@ func TestCollectorNoParent(t *testing.T) {
 		ParentID: nil,
 		TraceID:  1,
 		ID:       2,
-		Name:     "TEST",
+		Name:     name,
 		Annotations: []*zipkincore.Annotation{
 			&zipkincore.Annotation{
 				Value: "TESTANNOTATION",
@@ -67,7 +74,7 @@ func TestCollectorNoParent(t *testing.T) {
 			},
 		},
 	}
-	collector.Collect(span)
+	_ = collector.Collect(span)
 }
 
 func TestCollectorWithParent(t *testing.T) {
@@ -81,16 +88,16 @@ func TestCollectorWithParent(t *testing.T) {
 		if evt, ok = event.(frame); !ok {
 			t.Error("did not log a zipkin frame")
 		}
-		if evt.Zipkin.ParentID != "0000000000000003" {
+		if evt.Zipkin.ParentID != id3 {
 			t.Errorf("expected parent 0000000000000003 but found %s", evt.Zipkin.ParentID)
 		}
-		if evt.Zipkin.TraceID != "0000000000000001" {
+		if evt.Zipkin.TraceID != id1 {
 			t.Errorf("expected trace 0000000000000001 but found %s", evt.Zipkin.TraceID)
 		}
-		if evt.Zipkin.SpanID != "0000000000000002" {
+		if evt.Zipkin.SpanID != id2 {
 			t.Errorf("expected span 0000000000000002 but found %s", evt.Zipkin.SpanID)
 		}
-		if evt.Zipkin.Name != "TEST" {
+		if evt.Zipkin.Name != name {
 			t.Errorf("expected name TEST but found %s", evt.Zipkin.Name)
 		}
 		if len(evt.Zipkin.BinaryAnnotations) != 1 {
@@ -114,7 +121,7 @@ func TestCollectorWithParent(t *testing.T) {
 		ParentID: &parentID,
 		TraceID:  1,
 		ID:       2,
-		Name:     "TEST",
+		Name:     name,
 		Annotations: []*zipkincore.Annotation{
 			&zipkincore.Annotation{
 				Value: "TESTANNOTATION",
@@ -131,5 +138,5 @@ func TestCollectorWithParent(t *testing.T) {
 			},
 		},
 	}
-	collector.Collect(span)
+	_ = collector.Collect(span)
 }
