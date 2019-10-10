@@ -1,7 +1,7 @@
 <a id="markdown-httptrace--zipkin-tracing-integration-for-http-services" name="httptrace--zipkin-tracing-integration-for-http-services"></a>
 # httptrace -Zipkin tracing integration for HTTP services. #
 [![GoDoc](https://godoc.org/github.com/asecurityteam/httptrace?status.svg)](https://godoc.org/github.com/asecurityteam/httptrace)
-[![Build Status](https://travis-ci.org/asecurityteam/httptrace.png?branch=master)](https://travis-ci.org/asecurityteam/httptrace)
+[![Build Status](https://travis-ci.com/asecurityteam/httptrace.png?branch=master)](https://travis-ci.com/asecurityteam/httptrace)
 [![codecov.io](https://codecov.io/github/asecurityteam/httptrace/coverage.svg?branch=master)](https://codecov.io/github/asecurityteam/httptrace?branch=master)
 
 *Status: Production*
