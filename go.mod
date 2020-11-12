@@ -11,7 +11,7 @@ require (
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
-	github.com/golang/mock v0.0.0-20190508161146-9fa652df1129
+	github.com/golang/mock v1.4.4
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/opentracing-contrib/go-observer v0.0.0-20170622124052-a52f23424492 // indirect
 	github.com/opentracing/opentracing-go v1.1.0
