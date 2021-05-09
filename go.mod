@@ -13,7 +13,7 @@ require (
 	github.com/golang/mock v1.4.4
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/opentracing-contrib/go-observer v0.0.0-20170622124052-a52f23424492 // indirect
-	github.com/opentracing/opentracing-go v1.1.0
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/openzipkin/zipkin-go-opentracing v0.3.2
 	github.com/pierrec/lz4 v2.2.6+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20190706150252-9beb055b7962 // indirect
